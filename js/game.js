@@ -34,9 +34,6 @@ import { Player } from "./player.js";
 import { NPC } from "./npc.js";
 import { Enemy } from "./enemy.js"
 import { Item, Inventory } from "./item.js"
-import { QuestLog } from "./quest.js"
-import { Dialogue } from "./dialogue.js";
-import { Battle } from "./battle.js";
 import { UI } from "./ui.js"
 import { Floaters, Particles } from "./particles.js";
 
@@ -71,9 +68,9 @@ class Game {
         this.camera = new Camera();
         this.player = new Player(this.mapData.playerStart.x, this.mapData.playerStart.y)
         this.inventory = new Inventory();
-        this.dialogue = new Dialogue();
-        this.questLog = new QuestLog();
-        this.questLog.define(this.mapData.quests || []);
+      //  this.dialogue = new Dialogue();
+        //this.questLog = new QuestLog();
+       // this.questLog.define(this.mapData.quests || []);
         this.npcs = [];
         this.enemies = [];
         this.items = [];
@@ -133,10 +130,6 @@ class Game {
             this.state = STATE.INVENTORY; 
             return;
         }
-        if(Input.wasPressed("KeyQ")) {
-            Sound.play("blip");
-            this.questLog.toggleHud();
-        }
 
         this.nearbyNpc = this.npcs.find(n=> n.isNear(this.player));
         if(this.nearbyNpc && !this.player.attacking && Input.wasPressed("KeyT")){
@@ -152,7 +145,7 @@ class Game {
             return;
         }
 
-        Battle.resolvePlayerAttack(this.player, this.enemies, this.questLog);
+        //Battle.resolvePlayerAttack(this.player, this.enemies, this.questLog);
 
         for(const enemy of this.enemies){
             enemy.update(dt, this.player, this.map);
@@ -166,34 +159,27 @@ class Game {
             if(!item.collected && item.overlaps(this.player)){
                 item.collected = true;
                 this.inventory.add(item.id, item.name);
-                this.questLog.onCollect(item.id);
+                //this.questLog.onCollect(item.id);
                 if(item.heal) this.player.heal(item.heal);
             }
         }
         this.items = this.items.filter(i => !i.collected);
         
-        const all = Object.values(this.questLog.quests);
-        if(all.length > 0 && all.every(q => q.completed)){
-            Sound.stopMusic();
-            Sound.play("quest");
-            this.state = STATE.WIN;
-        }
         
         this.camera.follow(this.player, this.map);
     }
 
     startConversation(npc){
         this.state = STATE.DIALOGUE;
-        this.questLog.onTalk(npc.name);
-
-        const quest = npc.givesQuest ?
-        this.questLog.quests[npc.givesQuest] : null;
+       // this.questLog.onTalk(npc.name);
+        //const quest = npc.givesQuest ?
+        //this.questLog.quests[npc.givesQuest] : null;
         let pages = npc.dialogue;
         let offersQuest = true;
         let handInNow = false;
-        if (quest && quest.started) {
+        if (true) {
             offersQuest = false;
-            const done = quest.objectives.every(o => o.current >= o.needed);
+            const done = false //quest.objectives.every(o => o.current >= o.needed);
             if (done && npc.dialogueComplete && !quest.turnedIn) {
                 pages = npc.dialogueComplete;
                 handInNow = true;
@@ -208,12 +194,12 @@ class Game {
             npc.name,
             pages,
             () => {
-                if (offersQuest && npc.givesQuest && !npc._declined) {
-                    this.questLog.start(npc.givesQuest);
+                if (false) {
+                   // this.questLog.start(npc.givesQuest);
                 }
-                if (handInNow && quest) {
-                    quest.turnedIn = true;
-                    quest.checkComplete();
+                if (false) {
+                    //quest.turnedIn = true;
+                    //quest.checkComplete();
                 }
                 npc._declined = false;
             },
@@ -250,7 +236,7 @@ class Game {
         Floaters.draw(ctx, this.camera);
 
         UI.drawHealth(ctx, this.player);
-        UI.drawQuests(ctx, this.questLog);
+     //   UI.drawQuests(ctx, this.questLog);
         UI.drawMap(ctx, this.map, this.player, this.enemies)
 
         if(this.state === STATE.PLAYING && this.nearbyNpc){

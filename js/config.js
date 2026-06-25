@@ -16,7 +16,7 @@
 export const CONFIG = {
     TILE_SIZE : 16, //Pixel size of tiles in the art
     SCALE : 3, //sprites are scaled up by this amount. ex, an original size of 16 by scale of 3 is 48 pixesl
-    VIEW_TILES_X : 16, //number of tiles seen by the camera in the x direction
+    VIEW_TILES_X : 18, //number of tiles seen by the camera in the x direction
     VIEW_TILES_Y : 12, //number of tiles seen by the camera in the y direction
 
     PLAYER_SPEED : 190, //pixels moved per second
