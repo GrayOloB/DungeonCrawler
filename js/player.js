@@ -53,9 +53,6 @@ export class Player {
         this.attackDamage = CONFIG.PLAYER_ATTACK_DAMAGE;
         this.justLeveledTimer = 0;
 
-        this.attacking = false;
-        this.attackTimer = 0;
-        this.attackHasHit = false;
         this.invincibleTimer = 0;
         this.dashTimer = 0; 
         this.dashCooldown = 0;
@@ -101,21 +98,7 @@ export class Player {
         if(this.invincibleTimer > 0) this.invincibleTimer -= dt;
         if(this.justLeveledTimer > 0) this.justLeveledTimer -= dt;
 
-        //console.log(this.attackTimer);
-        //console.log(this.attackHasHit);
-        if(this.attacking){
-            this.attackTimer -= dt;
-            this.anim.update(dt, FRAMES.sword);
-            if (this.attackTimer <=0){
-                this.attacking = false;
-                this.anim.reset();
-            }
-            return;
-        }
-        if(Input.wasPressed("Space")){
-            this.startAttack();
-            return;
-        }
+
         let dx = 0, dy = 0;
         this.dashTimer -= dt;
         this.dashCooldown -= dt;
@@ -172,24 +155,6 @@ export class Player {
         //this.y = Math.max(0+CONFIG.SCALED_TILE*2,
           //   Math.min(this.y, map.pixelHeight - this.height-CONFIG.SCALED_TILE*2));
     }
-    startAttack(){
-        this.attacking = true;
-        this.attackTimer = FRAMES.sword / CONFIG.ANIM_FPS;
-        this.attackHasHit = false;
-        this.anim.reset();
-        Sound.play("attack");
-    }
-
-    getAttackBox(){
-        const cx = this.x + this.width / 2;
-        const cy = this.y + this.height / 2;
-        const reach = this.width/2 + CONFIG.PLAYER_ATTACK_RANGE;
-        const t = 4
-        if (this.dir === DIR.RIGHT) return { x: cx, y: cy-t, w: reach, h: t*2 };
-        if (this.dir === DIR.LEFT) return { x: cx-reach, y: cy-t, w: reach, h: t*2 };
-        if (this.dir === DIR.UP) return { x: cx-t, y: cy-reach, w: t*2, h: reach };
-        return { x: cx-t, y: cy, w: t*2, h: reach }; 
-    }
 
     takeDamage(amount){
         if(this.invincibleTimer>0) return;
@@ -205,7 +170,7 @@ export class Player {
         
         const screenX = Math.round(this.x - this.spriteOffsetX - camera.x);
         const screenY = Math.round(this.y - this.spriteOffsetY - camera.y);
-        const sheet = this.attacking ? "bunny_sword" : (this.moving ? "bunny_run" : "bunny_idle");
+        const sheet = (this.moving ? "bunny_run" : "bunny_idle");
 
         this.trail.forEach((t, i) => {
             //needs to pass camera position like above ^^^^^^^^  
