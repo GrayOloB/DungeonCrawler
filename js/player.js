@@ -50,7 +50,7 @@ export class Player {
         this.xp = 0;
         this.xpToNext = CONFIG.XP_BASE;
 
-        this.range = 60;
+        this.range = 50;
         this.attacking = false;
         this.attackTimer = .25;
         this.attackCooldown = .25;
@@ -191,6 +191,24 @@ export class Player {
 
     get isDead(){ return this.hp <= 0; }
 
+    getSwordHitbox(){
+        if (!this.attacking) return;
+        const tracking = 1 - (this.attackTimer / this.attackCooldown);
+        const angle = -(60*Math.PI/180)/2 + (60*Math.PI/180)*tracking
+        const cAngle = angle + this.attackAngle - Math.PI/2;
+        const radius = this.range*1.5;
+
+        const centerX = this.x + 24;
+        const centerY = this.y + 24;
+
+        const hitboxX = centerX + radius * Math.cos(cAngle)
+        const hitboxY = centerY + radius * Math.sin(cAngle)
+        return {
+            x: hitboxX,
+            y: hitboxY,
+            radius: 20
+        };
+    }
     draw(ctx, camera){
 
         
@@ -209,13 +227,14 @@ export class Player {
         ctx.globalAlpha = 1;
         this.anim.draw(ctx, sheet, this.DIR, screenX, screenY);
 
+        //sword animation / rotation
         if(this.attacking){
             console.log("hi")
   
             const centerX = screenX + this.spriteOffsetX+24;
             const centerY = screenY + this.spriteOffsetY+24;
 
-            const radius = 40;
+            const radius = this.range;
             ctx.translate(centerX, centerY);
             const tracking = 1 - (this.attackTimer/this.attackCooldown);
             const angle = -(60*Math.PI/180)/2 + (60*Math.PI/180)*tracking
@@ -227,6 +246,21 @@ export class Player {
             ctx.rotate(-radians);
             ctx.translate(-centerX, -centerY);
 
+        }
+        //hitbox draw it outttttttt
+        const hitbox = this.getSwordHitbox();
+        if (hitbox) {
+            const paintHitX = hitbox.x - camera.x;
+            const paintHitY = hitbox.y - camera.y;
+
+            ctx.strokeStyle = "rgba(255, 0, 0, 0.8)"; 
+            ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(paintHitX, paintHitY, hitbox.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+  
         }
     }
 }
