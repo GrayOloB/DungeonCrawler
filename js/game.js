@@ -136,7 +136,7 @@ class Game {
             this.startConversation(this.nearbyNpc);
             return;
         }
-        this.player.update(dt, this.map);
+        this.player.update(dt, this.map, this.camera);
 
         if(this.player.isDead){
             Sound.stopMusic();

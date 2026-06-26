@@ -52,8 +52,9 @@ export class Player {
 
         this.range = 60;
         this.attacking = false;
-        this.attackTimer = 3;
-        this.attackCooldown = 3;
+        this.attackTimer = .25;
+        this.attackCooldown = .25;
+        this.attackAngle = 0;
 
         this.attackDamage = CONFIG.PLAYER_ATTACK_DAMAGE;
         this.justLeveledTimer = 0;
@@ -97,7 +98,7 @@ export class Player {
         return{ x: this.x, y: this.y, w: this.width, h: this.height};
     }
 
-    update(dt,map) {
+    update(dt,map,camera) {
 
         this.trail.push({x:this.x, y:this.y, dir:this.DIR});
         if(this.trail.length > 6) this.trail.shift();
@@ -133,6 +134,13 @@ export class Player {
         if(Input.wasPressed("Space") && !this.attacking){
             this.attacking = true;
             this.attackTimer = this.attackCooldown;
+
+            const screenX = Math.round(this.x - this.spriteOffsetX - camera.x);
+            const screenY = Math.round(this.y - this.spriteOffsetY - camera.y);
+            const CX = screenX + this.spriteOffsetX + 24;
+            const CY = screenY + this.spriteOffsetY + 24;
+
+            this.attackAngle = Math.atan2(Input.mouseY- CY, Input.mouseX - CX) + Math.PI/2;
         }
 
         this.moving = (dx !== 0 || dy !== 0);
@@ -204,16 +212,18 @@ export class Player {
         if(this.attacking){
             console.log("hi")
   
-            const centerX = screenX + this.spriteOffsetX;
-            const centerY = screenY + this.spriteOffsetY;
+            const centerX = screenX + this.spriteOffsetX+24;
+            const centerY = screenY + this.spriteOffsetY+24;
 
-            let mx = Input.mouseX;
-            let my = Input.mouseY;
+            const radius = 40;
             ctx.translate(centerX, centerY);
+            const tracking = 1 - (this.attackTimer/this.attackCooldown);
+            const angle = -(60*Math.PI/180)/2 + (60*Math.PI/180)*tracking
 
-            const radians = Math.atan2(my-centerY, mx - centerX);
+            const radians = this.attackAngle + angle;
+
             ctx.rotate(radians);
-            ctx.drawImage(Images[sheetSword],-this.spriteOffsetX, -this.spriteOffsetY, 48,48);
+            ctx.drawImage(Images[sheetSword],24-this.spriteOffsetX, -radius-this.spriteOffsetY, 48,48);
             ctx.rotate(-radians);
             ctx.translate(-centerX, -centerY);
 
