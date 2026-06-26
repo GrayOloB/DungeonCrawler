@@ -168,7 +168,15 @@ class Game {
         
         this.camera.follow(this.player, this.map);
     }
-
+    spawnEnemy(type, x, y){
+        let enemyData = {
+            type:type,
+            x:x,
+            y:y,
+            
+        }
+        this.enemies.push(new Enemy(enemyData));
+    }
     startConversation(npc){
         this.state = STATE.DIALOGUE;
        // this.questLog.onTalk(npc.name);
