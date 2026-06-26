@@ -65,6 +65,7 @@ export class Player {
 
         this.trail = [];
 
+  
 
     }
 
@@ -202,14 +203,16 @@ export class Player {
 
         if(this.attacking){
             console.log("hi")
-    
-    // 1. Calculate the exact pixel center of the bunny graphic
+  
             const centerX = screenX + this.spriteOffsetX;
             const centerY = screenY + this.spriteOffsetY;
-    
+
+            let mx = Input.mouseX;
+            let my = Input.mouseY;
             ctx.translate(centerX, centerY);
     
-            let degrees = 90;
+            let degrees = Math.atan2(my-centerY, mx - centerX);
+
             const radians = degrees/180 * Math.PI;
             ctx.rotate(radians);
             ctx.drawImage(Images[sheetSword],-this.spriteOffsetX, -this.spriteOffsetY, 48,48);
