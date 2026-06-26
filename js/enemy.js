@@ -172,12 +172,13 @@ export class Enemy{
         this.moveAxis(0, stepY, map);
     }
     moveAxis(mx, my, map){
+        const p = 8; //offset
         const nx = this.x + mx, ny = this.y + my;
         const corners = [
-            [nx,ny],
-            [nx+this.width-1,ny],
-            [nx,ny+this.height-1],
-            [nx+this.width-1, ny+this.height-1],
+            [nx + p,ny+p],
+            [nx+this.width-1 - p,ny + p],
+            [nx+p,ny+this.height-1 - p],
+            [nx+this.width-1-p, ny+this.height-1-p],
         ];
         for (const [cx, cy] of corners)
             if(map.isSolidAtPixel(cx,cy)) return;
@@ -228,5 +229,7 @@ export class Enemy{
             ctx.fillStyle = "#3a2e3f"; ctx.fillRect(barX, barY, barW, 4);
             ctx.fillStyle = "#e85d75"; ctx.fillRect(barX, barY, barW * (this.hp/this.def.hp), 4);
         }
+        
     }
+   
 }

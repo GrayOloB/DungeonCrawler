@@ -56,7 +56,7 @@ class Game {
     }
     async boot(){
         await loadAllAssets();
-        const res = await fetch("assets/the_warren.json");//("assets/map_meadow.json");
+        const res = await fetch("assets/room1.json");//("assets/map_meadow.json");
         this.mapData = await res.json();
         this.state = STATE.TITLE
         //this.loadWorld();
