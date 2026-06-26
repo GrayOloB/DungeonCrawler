@@ -30,9 +30,20 @@ window.addEventListener("keydown", (e) => {
     });
     window.addEventListener("keyup", (e) => {
         held[e.code] = false;
-    });
+});
+
+window.addEventListener('mousemove', (e) => {
+    const canvas = document.getElementById("game");
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    
+    Input.mouseX = (event.clientX - rect.left) * (canvas.width / rect.width);
+    Input.mouseY = (event.clientY - rect.top) * (canvas.height / rect.height);
+});
 
 export const Input = {
+    mouseX : 0,
+    mouseY : 0,
     isDown(code) { 
         return held[code] === true;}, //checks for key being held down and returns it
 
