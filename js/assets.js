@@ -20,6 +20,7 @@ const IMAGE_FILES = {
   campfire:   "assets/tilesets/campfire.png",
 
   // Character + enemy sprite sheets
+  sword : "assets/sprites/sword.png",
   bunny_idle:  "assets/sprites/bunny_idle.png",
   bunny_run:   "assets/sprites/bunny_run.png",
   bunny_sword: "assets/sprites/bunny_sword.png",

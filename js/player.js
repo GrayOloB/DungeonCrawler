@@ -50,6 +50,11 @@ export class Player {
         this.xp = 0;
         this.xpToNext = CONFIG.XP_BASE;
 
+        this.range = 60;
+        this.attacking = false;
+        this.attackTimer = 0.3;
+        this.attackCooldown = 1;
+
         this.attackDamage = CONFIG.PLAYER_ATTACK_DAMAGE;
         this.justLeveledTimer = 0;
 
@@ -59,6 +64,7 @@ export class Player {
         this.speed = CONFIG.PLAYER_SPEED
 
         this.trail = [];
+
 
     }
 
@@ -116,6 +122,17 @@ export class Player {
             dy -= 1; this.DIR = DIR.UP;}
         if(Input.down) {
             dy += 1; this.DIR = DIR.DOWN;}
+            //attacking
+
+        if (this.attackTimer < 0) {
+            this.attacking = false
+        } else {
+            this.attackTimer -= dt;
+        }
+        if(Input.wasPressed("Space") && !this.attacking){
+            this.attacking = true;
+            this.attackTimer = this.attackCooldown;
+        }
 
         this.moving = (dx !== 0 || dy !== 0);
 
@@ -171,6 +188,7 @@ export class Player {
         const screenX = Math.round(this.x - this.spriteOffsetX - camera.x);
         const screenY = Math.round(this.y - this.spriteOffsetY - camera.y);
         const sheet = (this.moving ? "bunny_run" : "bunny_idle");
+        const sheetSword = "sword"
 
         this.trail.forEach((t, i) => {
             //needs to pass camera position like above ^^^^^^^^  
@@ -182,6 +200,12 @@ export class Player {
         ctx.globalAlpha = 1;
         this.anim.draw(ctx, sheet, this.DIR, screenX, screenY);
 
+        if(this.attacking){
+            console.log("hi")
+            const swordX = this.x - 8 - camera.x
+            const swordY = this.y - 8 - camera.y
+            this.anim.draw(ctx, sheetSword, 0, swordX,swordY)
+        }
         
     }
 }
