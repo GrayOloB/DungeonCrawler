@@ -52,8 +52,8 @@ export class Player {
 
         this.range = 60;
         this.attacking = false;
-        this.attackTimer = 0.3;
-        this.attackCooldown = 1;
+        this.attackTimer = 3;
+        this.attackCooldown = 3;
 
         this.attackDamage = CONFIG.PLAYER_ATTACK_DAMAGE;
         this.justLeveledTimer = 0;
@@ -202,10 +202,20 @@ export class Player {
 
         if(this.attacking){
             console.log("hi")
-            const swordX = this.x - 8 - camera.x
-            const swordY = this.y - 8 - camera.y
-            this.anim.draw(ctx, sheetSword, 0, swordX,swordY)
+    
+    // 1. Calculate the exact pixel center of the bunny graphic
+            const centerX = screenX + this.spriteOffsetX;
+            const centerY = screenY + this.spriteOffsetY;
+    
+            ctx.translate(centerX, centerY);
+    
+            let degrees = 90;
+            const radians = degrees/180 * Math.PI;
+            ctx.rotate(radians);
+            ctx.drawImage(Images[sheetSword],-this.spriteOffsetX, -this.spriteOffsetY, 48,48);
+            ctx.rotate(-radians);
+            ctx.translate(-centerX, -centerY);
+
         }
-        
     }
 }
