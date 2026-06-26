@@ -210,10 +210,8 @@ export class Player {
             let mx = Input.mouseX;
             let my = Input.mouseY;
             ctx.translate(centerX, centerY);
-    
-            let degrees = Math.atan2(my-centerY, mx - centerX);
 
-            const radians = degrees/180 * Math.PI;
+            const radians = Math.atan2(my-centerY, mx - centerX);
             ctx.rotate(radians);
             ctx.drawImage(Images[sheetSword],-this.spriteOffsetX, -this.spriteOffsetY, 48,48);
             ctx.rotate(-radians);
