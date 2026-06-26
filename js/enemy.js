@@ -21,6 +21,7 @@
 import { CONFIG } from "./config.js";
 import { SpriteAnimator } from "./sprite.js";
 import { Sound } from "./audio.js";
+import { AStar } from "./astar.js";
 
 const STATE = { IDLE : "idle", CHASE : "chase", HURT : "hurt", DEAD : "dead"}
 
@@ -28,7 +29,7 @@ const TYPES = {
     slime : {
         idleSheet: "slime_idle", hurtSheet : "slime_hurt", deathSheet : "slime_death",
         idleFrames : 8, hurtFrames : 2, deathFrames : 4,
-        hp : 10, speed:35, damage:3, sightRange:120, attackRange:30, xp:10,
+        hp : 10, speed:35, damage:3, sightRange:300, attackRange:30, xp:10,
     },
     bat : {
         idleSheet: "bat_idle", hurtSheet : "bat_hurt", deathSheet : "bat_death",
@@ -60,6 +61,10 @@ export class Enemy{
         this.deadTimer = 0;
         this.attackCooldown = 0;
         this.dead = false;
+
+        this.path = [];
+        this.astar = new AStar()
+        this.repath = 0.3
     }
 
     get centerX(){ return this.x + this.width/2;}
@@ -113,25 +118,59 @@ export class Enemy{
                 //console.log(dist + " " + this.type)
                 if (dist > this.def.sightRange * 1.5){
                     this.state = STATE.IDLE;
+                    this.path = []
                     break;
                 }
-                const dx = (player.x+player.width/2) - this.centerX;
-                const dy = (player.y + player.height/2) - this.centerY;
-                const len = Math.hypot(dx, dy) || 1;
-                const stepX = (dx/len) * this.def.speed * dt;
-                const stepY = (dy/len) * this.def.speed * dt;
-                this.moveAxis(stepX, 0, map);
-                this.moveAxis(0, stepY, map);
+               // this.move(player,dt,map)
+
+                this.chaseWithPath(dt, player,map)
 
                 if (dist < this.def.attackRange && this.attackCooldown <= 0){
                     player.takeDamage(this.def.damage);
                     this.attackCooldown = 1.0;
                 }
+                
                 break;
             }
         }
     }
+    chaseWithPath(dt, player, map) {
+        const sCell = this.astar.cellOf(this.centerX, this.centerY);
+        const gCell = this.astar.cellOf(player.x + player.width / 2, player.y + player.height / 2);
+        this.repath -= dt;
+        if (this.repath <= 0) {
+            this.repath = 0.3;
+            this.path = this.astar.findPath(sCell.c, sCell.r, gCell.c, gCell.r, map);
+        }
 
+        if (this.path && this.path.length > 0) {
+            const next = this.path[0];
+            const target = this.astar.cellCenter(next.c, next.r);
+ 
+            const dx = target.x - this.centerX;
+            const dy = target.y - this.centerY;
+            const len = Math.hypot(dx, dy) || 1;
+
+            if (len < 32) {
+                this.path.shift();
+            } else {
+                const stepX = (dx / len) * this.def.speed * dt;
+                const stepY = (dy / len) * this.def.speed * dt;
+
+                this.moveAxis(stepX, 0, map);
+                this.moveAxis(0, stepY, map);
+            }
+        }   
+    }
+    move(player,dt,map){
+        const dx = (player.x+player.width/2) - this.centerX;
+        const dy = (player.y + player.height/2) - this.centerY;
+        const len = Math.hypot(dx, dy) || 1;
+        const stepX = (dx/len) * this.def.speed * dt;
+        const stepY = (dy/len) * this.def.speed * dt;
+        this.moveAxis(stepX, 0, map);
+        this.moveAxis(0, stepY, map);
+    }
     moveAxis(mx, my, map){
         const nx = this.x + mx, ny = this.y + my;
         const corners = [
