@@ -61,6 +61,7 @@ export class Enemy{
         this.deadTimer = 0;
         this.attackCooldown = 0;
         this.dead = false;
+        this.beenHit = false;
 
         this.path = [];
         this.astar = new AStar()
@@ -95,6 +96,7 @@ export class Enemy{
                 this.hurtTimer -= dt;
                 this.anim.update(dt, this.def.hurtFrames);
                 if(this.hurtTimer <= 0){
+                    this.beenHit = false
                     this.state = (this.hp <= 0) ? STATE.DEAD : STATE.CHASE;
                    // console.log(this.state);
                     if (this.state === STATE.DEAD){
@@ -151,7 +153,7 @@ export class Enemy{
             const dy = target.y - this.centerY;
             const len = Math.hypot(dx, dy) || 1;
 
-            if (len < 32) {
+            if (len < 8) {
                 this.path.shift();
             } else {
                 const stepX = (dx / len) * this.def.speed * dt;
@@ -187,6 +189,7 @@ export class Enemy{
     }
     takeDamage(amount){
         if(this.state === STATE.DEAD) return;
+        this.beenHit = true;
         this.hp -= amount;
         this.state = STATE.HURT;
         this.hurtTimer = 0.25;
@@ -203,7 +206,7 @@ export class Enemy{
     draw(ctx, camera){
         const offset = (CONFIG.PLAYER_FRAME_SIZE * CONFIG.SCALE - this.width) / 2;
         const sx = this.x - offset - camera.x;
-        const sy = this.y - (CONFIG.PLAYER_FRAME_SIZE * CONFIG.SCALE - this.height) + 6 - camera.y;
+        const sy = this.y - (CONFIG.PLAYER_FRAME_SIZE * CONFIG.SCALE - this.height)/2 - camera.y;
 
         let sheet = this.def.idleSheet, frames = this.def.idleFrames, row = 0;
         if(this.state === STATE.HURT) { 
@@ -212,7 +215,7 @@ export class Enemy{
             ctx.save();
             ctx.globalAlpha = this.hurtTimer/0.25;
             ctx.filter = "brightness(0) invert(1)";
-            this.anim.draw(ctx, sheet, sx, sy);
+            this.anim.draw(ctx, sheet,0, sx, sy);
             ctx.filter = "none";
             ctx.restore();
         }
@@ -229,6 +232,10 @@ export class Enemy{
             ctx.fillStyle = "#3a2e3f"; ctx.fillRect(barX, barY, barW, 4);
             ctx.fillStyle = "#e85d75"; ctx.fillRect(barX, barY, barW * (this.hp/this.def.hp), 4);
         }
+
+        //hitbox
+        ctx.fillStyle = "rgba(252, 128, 128, 0.2)";
+        ctx.fillRect(this.x - camera.x,this.y - camera.y,this.width,this.height);
         
     }
    
