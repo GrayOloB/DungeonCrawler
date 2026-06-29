@@ -6,6 +6,7 @@ export class worldHandler{
         this.rooms = {
             START : "start",
             ENEMY : "enemy",
+            ENEMY2 : "enemy2",
             BOSS : "boss",
             EMPTY : "empty"
         }
@@ -14,7 +15,7 @@ export class worldHandler{
         const roomNum = Math.floor((Math.random()*4 + 0.5) + 5)
         const grid = Array.from({ length: this.gridSize }, () => new Array(this.gridSize).fill(this.rooms.EMPTY));
         let sX = 4, sY = 4;
-        grid[sX][sY] = this.rooms.START;
+        grid[sX][sY] = "start";
 
         let filledRooms = [{x : sX, y: sY}];
 
@@ -32,9 +33,14 @@ export class worldHandler{
             let nX = rRoom.x + rDir.x;
             let nY = rRoom.y + rDir.y;
             if(nX >= 0 && nY >= 0 && nX<this.gridSize && nY < this.gridSize){
-                if (grid[nX][nY] === this.rooms.EMPTY) {
-                    grid[nX][nY] = this.rooms.ENEMY;
+                const r = Math.floor(Math.random() * 2);
+                if (grid[nX][nY] === "empty") {
+                    grid[nX][nY] = "enemy"
+                    if(r === 1){
+                        grid[nX][nY] = "enemy2"
+                    }
                     filledRooms.push({x : nX, y : nY})
+
                 }
             }
         }
@@ -44,10 +50,12 @@ export class worldHandler{
         let printString = "";
         for(let y = 0; y < this.gridSize; y++){
             for(let x = 0; x < this.gridSize; x++){
-                if (grid[x][y] === this.rooms.EMPTY){
+                if (grid[x][y] === "empty"){
                     printString += ("0 ")
-                } else if (grid[x][y] == this.rooms.ENEMY){
+                } else if (grid[x][y] == "enemy"){
                     printString += ("E ")
+                } else if (grid[x][y] == "enemy2"){
+                    printString += ("e ")
                 } else {
                     printString += ("S ")
                 }

@@ -105,6 +105,8 @@ class Game {
             fileR = "assets/starting_map.json"
         } else if (cRoom === "enemy"){
             fileR = "assets/fight_room_1.json"
+        } else if (cRoom === "enemy2"){
+            fileR = "assets/fight_room_2.json"
         }
         const res = await fetch(fileR);//("assets/map_meadow.json");
         this.mapData = await res.json();
