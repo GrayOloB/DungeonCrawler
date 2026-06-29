@@ -241,10 +241,11 @@ export class Player {
             const tracking = 1 - (this.attackTimer/this.attackCooldown);
             const angle = -(60*Math.PI/180)/2 + (60*Math.PI/180)*tracking
 
-            const radians = this.attackAngle + angle;
+            const radians = this.attackAngle + angle;// + (Math.PI/2);
 
             ctx.rotate(radians);
-            ctx.drawImage(Images[sheetSword],24-this.spriteOffsetX, -radius-this.spriteOffsetY, 48,48);
+           // ctx.drawImage(Images[sheetSword],24-this.spriteOffsetX, -radius-this.spriteOffsetY, 48,48);
+           ctx.drawImage(Images["purple"], 3*16,13*16,16,16,24-this.spriteOffsetX,-radius-this.spriteOffsetY,48,48);
             ctx.rotate(-radians);
             ctx.translate(-centerX, -centerY);
 
@@ -252,11 +253,12 @@ export class Player {
         //hitbox draw it outttttttt
         const hitbox = this.getSwordHitbox();
         if (hitbox) {
+            return;
             const paintHitX = hitbox.x - camera.x;
             const paintHitY = hitbox.y - camera.y;
 
-            ctx.strokeStyle = "rgba(255, 0, 0, 0.8)"; 
-            ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+            ctx.strokeStyle = "rgba(255, 0, 0, 0.3)"; 
+            ctx.fillStyle = "rgba(255, 0, 0, 0.1)";
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.arc(paintHitX, paintHitY, hitbox.radius, 0, Math.PI * 2);
