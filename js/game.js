@@ -36,6 +36,8 @@ import { Enemy } from "./enemy.js"
 import { Item, Inventory } from "./item.js"
 import { UI } from "./ui.js"
 import { Floaters, Particles } from "./particles.js";
+import { AttackHandler } from "./attackHandler.js";
+import { worldHandler } from "./generateWorld.js";
 
 const STATE = {
     LOADING : "loading",
@@ -53,35 +55,96 @@ class Game {
         this.ctx.imageSmoothingEnabled = false;
         this.lastTime = 0;
         this.state = STATE.LOADING;
+
+        this.handler = new worldHandler()
+        this.worldGrid = null;
+        this.roomX = 4;
+        this.roomY = 4;
     }
     async boot(){
         await loadAllAssets();
-        const res = await fetch("assets/room1.json");//("assets/map_meadow.json");
-        this.mapData = await res.json();
+        //const res = await fetch("assets/room1.json");//("assets/map_meadow.json");
+        //this.mapData = await res.json();
+       // this.loadRoom();
+       this.loadWorld();
         this.state = STATE.TITLE
         //this.loadWorld();
         requestAnimationFrame(this.loop.bind(this))
     }
 
-    loadWorld(){
-        this.map = new TileMap(this.mapData);
+    async loadWorld(){
+        this.worldGrid = this.handler.generateWorld();
+        this.handler.printGrid(this.worldGrid);
+        this.roomX = 4;
+        this.roomY = 4;
+        
+
+        //this.map = new TileMap(this.mapData);
         this.camera = new Camera();
-        this.player = new Player(this.mapData.playerStart.x, this.mapData.playerStart.y)
+
         this.inventory = new Inventory();
-      //  this.dialogue = new Dialogue();
-        //this.questLog = new QuestLog();
-       // this.questLog.define(this.mapData.quests || []);
         this.npcs = [];
         this.enemies = [];
         this.items = [];
+        await this.loadRoom();
+        this.player = new Player(this.mapData.playerStart.x, this.mapData.playerStart.y)
+        this.state = STATE.TITLE
+        Sound.playMusic(this.mapData.music || "town_theme");
+    }
+
+    async loadRoom(){
+        this.npcs = [];
+        this.enemies = [];
+        this.items = [];
+
+        let grid = this.worldGrid
+        let fileR = "assets/map_meadow.json"
+        let cRoom = grid[this.roomX][this.roomY]
+
+        if(cRoom === "start"){
+            fileR = "assets/startroom.json"
+        } else if (cRoom === "enemy"){
+            fileR = "assets/room1.json"
+        }
+        const res = await fetch(fileR);//("assets/map_meadow.json");
+        this.mapData = await res.json();
+
+        this.map = new TileMap(this.mapData);
+        //this.player = new Player(this.mapData.playerStart.x, this.mapData.playerStart.y)
+
         for(const e of this.mapData.entities){
             if (e.kind === "npc") this.npcs.push(new NPC(e));
             else if (e.kind === "enemy") this.enemies.push(new Enemy(e))
             else if (e.kind === "item") this.items.push(new Item(e));
         }
-        Sound.playMusic(this.mapData.music || "town_theme");
     }
-
+    roomChange(){
+        
+        const p = this.player
+        
+        let changed = false;
+        if(p.x + p.width > this.map.pixelWidth){
+            this.roomX++;
+            changed = true;
+        }
+        if(p.x < 0){
+            this.roomX--;
+            changed = true;
+        }
+        if(p.y + p.height > this.map.pixelHeight){
+            this.roomY++;
+            changed = true;
+        }
+        if(p.y < 0){
+            this.roomY--;
+            changed = true;
+        }
+        if(changed){
+            this.loadRoom()
+            this.player.x = this.map.pixelWidth/2;
+            this.player.y = this.map.pixelHeight/2;
+        }
+    }
     loop(timestamp){
         let dt = (timestamp - this.lastTime)/1000;
         this.lastTime = timestamp;
@@ -98,7 +161,7 @@ class Game {
        switch(this.state){
         case STATE.TITLE:
             if(Input.wasPressed("Space") || Input.wasPressed("Enter")){
-                this.loadWorld();
+               // this.loadWorld();
                 this.state = STATE.PLAYING;
             }
             break;
@@ -125,6 +188,7 @@ class Game {
        }
     }
     updatePlaying(dt){
+        this.roomChange();
         if(Input.wasPressed("KeyI")) {
             Sound.play("select");
             this.state = STATE.INVENTORY; 
@@ -146,6 +210,7 @@ class Game {
         }
 
         //Battle.resolvePlayerAttack(this.player, this.enemies, this.questLog);
+        AttackHandler.resolvePlayerAttack(this.player, this.enemies);
 
         for(const enemy of this.enemies){
             enemy.update(dt, this.player, this.map);
