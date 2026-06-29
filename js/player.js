@@ -50,11 +50,12 @@ export class Player {
         this.xp = 0;
         this.xpToNext = CONFIG.XP_BASE;
 
-        this.range = 50;
+        this.range = 40;
         this.attacking = false;
         this.attackTimer = .25;
         this.attackCooldown = .25;
         this.attackAngle = 0;
+        this.attackHasHit = false;
 
         this.attackDamage = CONFIG.PLAYER_ATTACK_DAMAGE;
         this.justLeveledTimer = 0;
@@ -159,14 +160,15 @@ export class Player {
         }
     }
     moveAxis(mx, my, map){
+        const offset = 6;
         this.speed = this.dashTimer > 0 ? CONFIG.PLAYER_SPEED * 3 : CONFIG.PLAYER_SPEED;
         const nextX = this.x + mx;
         const nextY = this.y + my;
         const corners = [
-            [nextX, nextY],
-            [nextX+ this.width - 1, nextY],
-            [nextX, nextY + this.height - 1],
-            [nextX+ this.width - 1, nextY + this.height - 1]
+            [nextX+offset, nextY+offset],
+            [nextX + this.width - 1 - offset, nextY + offset],
+            [nextX + offset, nextY + this.height - 1 - offset],
+            [nextX+ this.width - 1 - offset, nextY + this.height - 1 - offset]
         ];
         for(const [cx, cy] of corners){
             if(map.isSolidAtPixel(cx, cy)){
@@ -196,7 +198,7 @@ export class Player {
         const tracking = 1 - (this.attackTimer / this.attackCooldown);
         const angle = -(60*Math.PI/180)/2 + (60*Math.PI/180)*tracking
         const cAngle = angle + this.attackAngle - Math.PI/2;
-        const radius = this.range*1.5;
+        const radius = this.range*1.6;
 
         const centerX = this.x + 24;
         const centerY = this.y + 24;
