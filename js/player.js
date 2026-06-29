@@ -231,7 +231,7 @@ export class Player {
 
         //sword animation / rotation
         if(this.attacking){
-            console.log("hi")
+           // console.log("hi")
   
             const centerX = screenX + this.spriteOffsetX+24;
             const centerY = screenY + this.spriteOffsetY+24;
