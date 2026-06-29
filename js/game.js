@@ -98,13 +98,13 @@ class Game {
         this.items = [];
 
         let grid = this.worldGrid
-        let fileR = "assets/map_meadow.json"
+        let fileR = "assets/room1.json"
         let cRoom = grid[this.roomX][this.roomY]
 
         if(cRoom === "start"){
-            fileR = "assets/startroom.json"
+            fileR = "assets/starting_map.json"
         } else if (cRoom === "enemy"){
-            fileR = "assets/room1.json"
+            fileR = "assets/fight_room_1.json"
         }
         const res = await fetch(fileR);//("assets/map_meadow.json");
         this.mapData = await res.json();
@@ -119,30 +119,38 @@ class Game {
         }
     }
     roomChange(){
-        
+        const offset = CONFIG.SCALED_TILE * 1
         const p = this.player
         
         let changed = false;
         if(p.x + p.width > this.map.pixelWidth){
+            if(this.worldGrid[this.roomX+1][this.roomY] === "empty") return;
             this.roomX++;
             changed = true;
+            this.player.x = offset
         }
         if(p.x < 0){
+             if(this.worldGrid[this.roomX-1][this.roomY] === "empty") return;
             this.roomX--;
             changed = true;
+            this.player.x = this.map.pixelWidth - offset
         }
         if(p.y + p.height > this.map.pixelHeight){
+             if(this.worldGrid[this.roomX][this.roomY+1] === "empty") return;
             this.roomY++;
             changed = true;
+            this.player.y = offset
         }
         if(p.y < 0){
+             if(this.worldGrid[this.roomX][this.roomY-1] === "empty") return;
             this.roomY--;
             changed = true;
+            this.player.y = this.map.pixelHeight - offset
         }
         if(changed){
             this.loadRoom()
-            this.player.x = this.map.pixelWidth/2;
-            this.player.y = this.map.pixelHeight/2;
+           
+            
         }
     }
     loop(timestamp){
@@ -189,6 +197,7 @@ class Game {
     }
     updatePlaying(dt){
         this.roomChange();
+        //console.log(this.roomX + " " + this.roomY)
         if(Input.wasPressed("KeyI")) {
             Sound.play("select");
             this.state = STATE.INVENTORY; 

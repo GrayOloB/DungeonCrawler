@@ -18,6 +18,7 @@ const IMAGE_FILES = {
   floor:      "assets/tilesets/floor_detail.png",
   chest:      "assets/tilesets/chest.png",
   campfire:   "assets/tilesets/campfire.png",
+  purple: "assets/tilesets/purple_world.png",
 
   // Character + enemy sprite sheets
   sword : "assets/sprites/sword.png",
