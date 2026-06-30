@@ -242,6 +242,8 @@ export const UI = {
                     ctx.fillStyle = "#85b066";
                 } else if (room === "boss"){
                     ctx.fillStyle = "#4c1c14"
+                } else if (room === "shop"){
+                    ctx.fillStyle = "#b92680"
                 } else {
                     ctx.fillStyle = "#b74632"
                 }
