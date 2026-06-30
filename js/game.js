@@ -38,6 +38,7 @@ import { UI } from "./ui.js"
 import { Floaters, Particles } from "./particles.js";
 import { AttackHandler } from "./attackHandler.js";
 import { worldHandler } from "./generateWorld.js";
+import { Boss } from "./boss.js";
 
 const STATE = {
     LOADING : "loading",
@@ -61,6 +62,9 @@ class Game {
         this.roomX = 4;
         this.roomY = 4;
         this.clearBuffer = 1;
+
+        this.fightingBoss = false;
+        this.bossfight = null;
         
     }
     async boot(){
@@ -128,6 +132,10 @@ class Game {
                 if(!isCleared) {this.enemies.push(new Enemy(e))}
             }
             else if (e.kind === "item") this.items.push(new Item(e));
+        }
+        if(cRoom === "boss"){
+            this.fightingBoss = true;
+            this.bossfight = new Boss(this.map.pixelWidth/2, this.map.pixelHeight/2);
         }
     }
     roomChange(){
@@ -241,13 +249,21 @@ class Game {
             this.state = STATE.GAMEOVER;
             return;
         }
-
+        if(this.fightingBoss && this.bossfight){
+            this.bossfight.update(dt, this.player);
+            if(this.bossfight.hp<=0){
+                this.bossfight = null;
+                this.fightingBoss = false;
+                console.log("a");
+            }
+        }
         //Battle.resolvePlayerAttack(this.player, this.enemies, this.questLog);
         AttackHandler.resolvePlayerAttack(this.player, this.enemies);
 
         for(const enemy of this.enemies){
             enemy.update(dt, this.player, this.map);
         }
+
         this.enemies = this.enemies.filter(e=>!e.dead);
 
         if(this.enemies.length === 0 && this.clearBuffer <= 0){
@@ -350,6 +366,10 @@ class Game {
         things.sort((a,b) => (a.y + a.height) - (b.y + b.height));
         for (const t of things) t.draw(ctx, this.camera);
         
+        if(this.fightingBoss){
+            this.bossfight.draw(ctx, this.camera);
+        }
+
         this.map.drawLayer(ctx, "decor", this.camera);
         Particles.draw(ctx,this.camera);
         Floaters.draw(ctx, this.camera);

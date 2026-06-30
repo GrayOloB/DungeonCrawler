@@ -22,6 +22,7 @@ import { CONFIG } from "./config.js";
 import { SpriteAnimator } from "./sprite.js";
 import { Sound } from "./audio.js";
 import { AStar } from "./astar.js";
+import { Projectile } from "./projectile.js";
 
 const STATE = { IDLE : "idle", CHASE : "chase", HURT : "hurt", DEAD : "dead"}
 
@@ -64,8 +65,11 @@ export class Enemy{
         this.beenHit = false;
 
         this.path = [];
-        this.astar = new AStar()
-        this.repath = 0.3
+        this.astar = new AStar();
+        this.repath = 0.3;
+        
+        this.bullets = [];
+        this.bulletCooldown = 1;
     }
 
     get centerX(){ return this.x + this.width/2;}
@@ -114,6 +118,13 @@ export class Enemy{
                 break;
             }
             case STATE.CHASE: {
+                /*this.bullets.push(
+                    new Projectile(this.x + this.width / 2, this.y + this.height / 2, 20, 20)
+                );
+                for(const bullet of this.bullets){
+                    bullet.update(dt);
+                }*/
+               // console.log(this.bullets)
                 //print(state);
                 this.anim.update(dt, this.def.idleFrames);
                 const dist = this.distanceTo(player);
@@ -204,6 +215,9 @@ export class Enemy{
     }
 
     draw(ctx, camera){
+        for(const bullet of this.bullets){
+            bullet.draw(ctx, camera);
+        }
         const offset = (CONFIG.PLAYER_FRAME_SIZE * CONFIG.SCALE - this.width) / 2;
         const sx = this.x - offset - camera.x;
         const sy = this.y - (CONFIG.PLAYER_FRAME_SIZE * CONFIG.SCALE - this.height)/2 - camera.y;
