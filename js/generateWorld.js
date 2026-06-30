@@ -12,12 +12,12 @@ export class worldHandler{
         }
     }
     generateWorld(difficulty){
-        const roomNum = Math.floor(Math.random()*2) + 5 + Math.floor(10 * difficulty / 3)
+        const roomNum = Math.floor(Math.random()*2) + 6 + Math.floor(10 * difficulty / 3)
         const grid = Array.from({ length: this.gridSize }, () => new Array(this.gridSize).fill(this.rooms.EMPTY));
         let sX = 4, sY = 4;
         let maxDist = -1;
-        let farX = 4;
-        let farY = 4;
+        let farX = 4, farY = 4;
+        let shopX = 4, shopY = 4;
         grid[sX][sY] = "start";
 
         let filledRooms = [{x : sX, y: sY}];
@@ -52,6 +52,21 @@ export class worldHandler{
         }
         
         grid[farX][farY] = "boss"
+        let shopDist = -1;
+        let c
+        for(let i = 0; i < filledRooms.length; i++){
+            let room = filledRooms[i]
+            if((room.x === sX && room.y === sY) || (room.x === farX && room.y === farY)){
+                continue;
+            }
+            let checkDist = Math.abs(farX - room.x) + Math.abs(farY - room.y);
+            if(checkDist > shopDist){
+                shopDist = checkDist;
+                shopX = room.x;
+                shopY = room.y;
+            }
+        }
+        grid[shopX][shopY] = "shop"
         return grid;
     }
     printGrid(grid){
@@ -64,6 +79,8 @@ export class worldHandler{
                     printString += ("S ")
                 } else if (grid[x][y] == "boss"){
                     printString += ("B ")
+                } else if (grid[x][y] == "shop"){
+                    printString += ("s ")
                 } else {
                     printString += ("e ")
                 }

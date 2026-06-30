@@ -41,9 +41,17 @@ window.addEventListener('mousemove', (e) => {
     Input.mouseY = (event.clientY - rect.top) * (canvas.height / rect.height);
 });
 
+window.addEventListener('mousedown', (e) => {
+    if (event.button === 0) {
+        Input.mouseClicked = true; 
+    }
+})
+
 export const Input = {
     mouseX : 0,
     mouseY : 0,
+    mouseClicked : false,
+
     isDown(code) { 
         return held[code] === true;}, //checks for key being held down and returns it
 

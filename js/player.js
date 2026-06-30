@@ -132,10 +132,10 @@ export class Player {
         } else {
             this.attackTimer -= dt;
         }
-        if(Input.wasPressed("Space") && !this.attacking){
+        if((/*Input.wasPressed("Space") || */Input.mouseClicked) && !this.attacking){
             this.attacking = true;
             this.attackTimer = this.attackCooldown;
-
+            Input.mouseClicked = false;
             const screenX = Math.round(this.x - this.spriteOffsetX - camera.x);
             const screenY = Math.round(this.y - this.spriteOffsetY - camera.y);
             const CX = screenX + this.spriteOffsetX + 24;

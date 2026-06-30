@@ -140,7 +140,7 @@ class Game {
             if(this.worldGrid[this.roomX+1][this.roomY] === "empty") return;
             this.roomX++;
             changed = true;
-            this.player.x = offset
+            this.player.x = offset/2
         }
         if(p.x < 0){
             if(this.roomX-1 < 0) return;
@@ -155,7 +155,7 @@ class Game {
             
             this.roomY++;
             changed = true;
-            this.player.y = offset
+            this.player.y = offset/2
         }
         if(p.y < 0){
             if(this.roomY-1 < 0) return;
