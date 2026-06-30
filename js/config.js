@@ -19,7 +19,7 @@ export const CONFIG = {
     VIEW_TILES_X : 17, //number of tiles seen by the camera in the x direction
     VIEW_TILES_Y : 12, //number of tiles seen by the camera in the y direction
 
-    PLAYER_SPEED : 190, //pixels moved per second
+    PLAYER_SPEED : 200,//190, //pixels moved per second
     PLAYER_FRAME_SIZE : 48, //Pixel size of player character
     PLAYER_MAX_HP : 20,
     PLAYER_ATTACK_DAMAGE : 5,

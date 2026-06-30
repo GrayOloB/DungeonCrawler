@@ -60,6 +60,8 @@ class Game {
         this.worldGrid = null;
         this.roomX = 4;
         this.roomY = 4;
+        this.clearBuffer = 1;
+        
     }
     async boot(){
         await loadAllAssets();
@@ -73,7 +75,7 @@ class Game {
     }
 
     async loadWorld(){
-        this.worldGrid = this.handler.generateWorld();
+        this.worldGrid = this.handler.generateWorld(1);
         this.handler.printGrid(this.worldGrid);
         this.roomX = 4;
         this.roomY = 4;
@@ -86,6 +88,7 @@ class Game {
         this.npcs = [];
         this.enemies = [];
         this.items = [];
+        this.clearedRooms = [];
         await this.loadRoom();
         this.player = new Player(this.mapData.playerStart.x, this.mapData.playerStart.y)
         this.state = STATE.TITLE
@@ -98,60 +101,74 @@ class Game {
         this.items = [];
 
         let grid = this.worldGrid
-        let fileR = "assets/room1.json"
+        let fileR = "assets/rooms/room1.json"
         let cRoom = grid[this.roomX][this.roomY]
 
         if(cRoom === "start"){
-            fileR = "assets/starting_map.json"
-        } else if (cRoom === "enemy"){
-            fileR = "assets/fight_room_1.json"
-        } else if (cRoom === "enemy2"){
-            fileR = "assets/fight_room_2.json"
-        }
+            fileR = "assets/rooms/starting_map.json"
+        } else {
+            fileR = "assets/rooms/" + cRoom + ".json"
+        } 
         const res = await fetch(fileR);//("assets/map_meadow.json");
         this.mapData = await res.json();
 
         this.map = new TileMap(this.mapData);
         //this.player = new Player(this.mapData.playerStart.x, this.mapData.playerStart.y)
-
+        let isCleared = false;
+        for(let i = 0; i < this.clearedRooms.length; i++){
+            if(this.clearedRooms[i].x === this.roomX &&
+                this.clearedRooms[i].y === this.roomY){
+                    isCleared = true;
+                    break;
+                }
+        }
         for(const e of this.mapData.entities){
             if (e.kind === "npc") this.npcs.push(new NPC(e));
-            else if (e.kind === "enemy") this.enemies.push(new Enemy(e))
+            else if (e.kind === "enemy"){ 
+                if(!isCleared) {this.enemies.push(new Enemy(e))}
+            }
             else if (e.kind === "item") this.items.push(new Item(e));
         }
     }
     roomChange(){
         const offset = CONFIG.SCALED_TILE * 1
         const p = this.player
-        
         let changed = false;
+
         if(p.x + p.width > this.map.pixelWidth){
+            if(this.roomX + 1 === this.worldGrid.length) return;
             if(this.worldGrid[this.roomX+1][this.roomY] === "empty") return;
             this.roomX++;
             changed = true;
             this.player.x = offset
         }
         if(p.x < 0){
-             if(this.worldGrid[this.roomX-1][this.roomY] === "empty") return;
+            if(this.roomX-1 < 0) return;
+            if(this.worldGrid[this.roomX-1][this.roomY] === "empty") return;
             this.roomX--;
             changed = true;
             this.player.x = this.map.pixelWidth - offset
         }
         if(p.y + p.height > this.map.pixelHeight){
-             if(this.worldGrid[this.roomX][this.roomY+1] === "empty") return;
+            if(this.roomY + 1 === this.worldGrid.length) return;
+            if(this.worldGrid[this.roomX][this.roomY+1] === "empty") return;
+            
             this.roomY++;
             changed = true;
             this.player.y = offset
         }
         if(p.y < 0){
-             if(this.worldGrid[this.roomX][this.roomY-1] === "empty") return;
+            if(this.roomY-1 < 0) return;
+            if(this.worldGrid[this.roomX][this.roomY-1] === "empty") return;
+            
             this.roomY--;
             changed = true;
             this.player.y = this.map.pixelHeight - offset
         }
         if(changed){
+            this.clearBuffer = 1;
             this.loadRoom()
-           
+           console.log(this.roomX + " " + this.roomY);
             
         }
     }
@@ -199,7 +216,12 @@ class Game {
     }
     updatePlaying(dt){
         this.roomChange();
+        if(this.clearBuffer > 0){
+            this.clearBuffer -= dt;
+        }
+        //console.log(this.enemies);
         //console.log(this.roomX + " " + this.roomY)
+        
         if(Input.wasPressed("KeyI")) {
             Sound.play("select");
             this.state = STATE.INVENTORY; 
@@ -227,6 +249,19 @@ class Game {
             enemy.update(dt, this.player, this.map);
         }
         this.enemies = this.enemies.filter(e=>!e.dead);
+
+        if(this.enemies.length === 0 && this.clearBuffer <= 0){
+            let s = false
+            for(let i = 0; i<this.clearedRooms.length; i++){
+                if(this.clearedRooms[i].x === this.roomX &&
+                    this.clearedRooms[i].y === this.roomY){
+                        s = true;
+                    }
+            }
+            if(!s){
+                this.clearedRooms.push({x:this.roomX,y:this.roomY})
+            }
+        }
 
         for(const npc of this.npcs) npc.update(dt);
 
@@ -321,7 +356,7 @@ class Game {
 
         UI.drawHealth(ctx, this.player);
      //   UI.drawQuests(ctx, this.questLog);
-        UI.drawMap(ctx, this.map, this.player, this.enemies)
+        UI.drawMap(ctx, this.worldGrid, this.roomX,this.roomY);
 
         if(this.state === STATE.PLAYING && this.nearbyNpc){
             UI.drawPrompt(ctx, `Press T to talk to ${this.nearbyNpc.name}`);

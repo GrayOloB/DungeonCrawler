@@ -11,10 +11,13 @@ export class worldHandler{
             EMPTY : "empty"
         }
     }
-    generateWorld(){
-        const roomNum = Math.floor((Math.random()*4 + 0.5) + 5)
+    generateWorld(difficulty){
+        const roomNum = Math.floor(Math.random()*2) + 5 + Math.floor(10 * difficulty / 3)
         const grid = Array.from({ length: this.gridSize }, () => new Array(this.gridSize).fill(this.rooms.EMPTY));
         let sX = 4, sY = 4;
+        let maxDist = -1;
+        let farX = 4;
+        let farY = 4;
         grid[sX][sY] = "start";
 
         let filledRooms = [{x : sX, y: sY}];
@@ -33,17 +36,22 @@ export class worldHandler{
             let nX = rRoom.x + rDir.x;
             let nY = rRoom.y + rDir.y;
             if(nX >= 0 && nY >= 0 && nX<this.gridSize && nY < this.gridSize){
-                const r = Math.floor(Math.random() * 2);
+                const r = Math.floor(Math.random() * 5 + 1);//fight room type
                 if (grid[nX][nY] === "empty") {
-                    grid[nX][nY] = "enemy"
-                    if(r === 1){
-                        grid[nX][nY] = "enemy2"
-                    }
+                    grid[nX][nY] = "fight_room_" + r.toString();
                     filledRooms.push({x : nX, y : nY})
-
+                    //console.log(grid[nX][nY]);
+                    let checkDist = Math.abs(sX - nX) + Math.abs(sY - nY);
+                    if(checkDist > maxDist){
+                        farX = nX;
+                        farY = nY;
+                        maxDist = checkDist;
+                    }
                 }
             }
         }
+        
+        grid[farX][farY] = "boss"
         return grid;
     }
     printGrid(grid){
@@ -51,13 +59,13 @@ export class worldHandler{
         for(let y = 0; y < this.gridSize; y++){
             for(let x = 0; x < this.gridSize; x++){
                 if (grid[x][y] === "empty"){
-                    printString += ("0 ")
-                } else if (grid[x][y] == "enemy"){
-                    printString += ("E ")
-                } else if (grid[x][y] == "enemy2"){
-                    printString += ("e ")
-                } else {
+                    printString += ("O ")
+                } else if (grid[x][y] == "start"){
                     printString += ("S ")
+                } else if (grid[x][y] == "boss"){
+                    printString += ("B ")
+                } else {
+                    printString += ("e ")
                 }
             }
             printString += ("\n")

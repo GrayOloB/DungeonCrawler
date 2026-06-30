@@ -218,15 +218,36 @@ export const UI = {
         }
         ctx.fillText(line,x,y)
     },
-    drawMap(ctx, map, player, enemies){
-        const mmX = CONFIG.CANVAS_WIDTH - 130, mmY = 12, mmW = 118, mmH = 88;
-        const sx = mmW / (map.width * CONFIG.SCALED_TILE); 
-        const sy = mmH / (map.height * CONFIG.SCALED_TILE);
-        ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(mmX, mmY, mmW, mmH);
-        ctx.fillStyle = "#9ad9b0";
-        ctx.fillRect(mmX + player.x*sx, mmY + player.y*sy, 3, 3);
-        ctx.fillStyle = "#f07167"; 
-        for (const e of enemies) ctx.fillRect(mmX + e.x*sx, mmY + e.y*sy, 3, 3);
+    drawMap(ctx, grid, rX, rY){
+        const mmX = CONFIG.CANVAS_WIDTH - 140, mmY = 12, mmW = 125, mmH = 100;
+       
+        ctx.fillStyle = "rgba(0,0,0,0.3)"; 
+        ctx.fillRect(mmX, mmY, mmW, mmH);
+        const gridSize = grid.length;
+        const roomW = mmW/gridSize;
+        const roomH = mmH/gridSize
+       
+        for(let x = 0; x<gridSize; x++){
+            for(let y = 0; y<gridSize; y++){
+                const room = grid[x][y];
+                if(room === "empty"){
+                    continue;
+                }
+                const drawnX = mmX + (x*roomW);
+                const drawnY = mmY + (y*roomH);
+
+                if(x === rX && y === rY){
+                    ctx.fillStyle = "#3f3694";
+                } else if (room === "start"){
+                    ctx.fillStyle = "#85b066";
+                } else if (room === "boss"){
+                    ctx.fillStyle = "#4c1c14"
+                } else {
+                    ctx.fillStyle = "#b74632"
+                }
+                ctx.fillRect(drawnX+.5,drawnY+.5,roomW-1,roomH-1);
+            }
+        }
     }
 
 };
