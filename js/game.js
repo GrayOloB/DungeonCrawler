@@ -197,6 +197,10 @@ class Game {
        switch(this.state){
         case STATE.TITLE:
             if(Input.wasPressed("Space") || Input.wasPressed("Enter")){
+                this.bossfight = null;
+                this.fightingBoss = false;
+                this.player = new Player(this.mapData.playerStart.x, this.mapData.playerStart.y)
+                this.cRoom = "start";
                // this.loadWorld();
                 this.state = STATE.PLAYING;
             }
@@ -216,6 +220,9 @@ class Game {
             }
             break;
         case STATE.GAMEOVER:
+            if (Input.wasPressed("Space") || Input.wasPressed("Enter")){
+                this.state = STATE.TITLE
+            }
         case STATE.WIN:
             if (Input.wasPressed("Space") || Input.wasPressed("Enter")){
                 this.state = STATE.TITLE
@@ -256,6 +263,7 @@ class Game {
                 this.bossfight = null;
                 this.fightingBoss = false;
                 console.log("a");
+                this.state = STATE.WIN;
             }
         }
         //Battle.resolvePlayerAttack(this.player, this.enemies, this.questLog);
