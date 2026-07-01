@@ -239,6 +239,10 @@ export class Enemy{
             row = 0;
         }
 
+        //hitbox
+        ctx.fillStyle = "rgba(252, 128, 128, 0.2)";
+        ctx.fillRect(this.x - camera.x,this.y - camera.y,this.width,this.height);
+
         this.anim.draw(ctx, sheet, row, sx, sy);
 
         if (this.state !== STATE.DEAD){
@@ -246,10 +250,6 @@ export class Enemy{
             ctx.fillStyle = "#3a2e3f"; ctx.fillRect(barX, barY, barW, 4);
             ctx.fillStyle = "#e85d75"; ctx.fillRect(barX, barY, barW * (this.hp/this.def.hp), 4);
         }
-
-        //hitbox
-        ctx.fillStyle = "rgba(252, 128, 128, 0.2)";
-        ctx.fillRect(this.x - camera.x,this.y - camera.y,this.width,this.height);
         
     }
    

@@ -44,12 +44,11 @@ export class SpriteAnimator {
         this.timer = 0;
     }
 
-    draw(ctx, imageName, row, x, y){
+    draw(ctx, imageName, row, x, y, size = this.frameSize * CONFIG.SCALE){
         const img = Images[imageName];
         if(!img) return;
         const sx = this.frameIndex * this.frameSize;
         const sy = row * this.frameSize;
-        const size = this.frameSize * CONFIG.SCALE;
         ctx.drawImage(img, sx, sy, this.frameSize, this.frameSize, x, y, size, size);
 
     }

@@ -142,6 +142,7 @@ class Game {
         const offset = CONFIG.SCALED_TILE * 1
         const p = this.player
         let changed = false;
+        if(this.fightingBoss === true) return;
 
         if(p.x + p.width > this.map.pixelWidth){
             if(this.roomX + 1 === this.worldGrid.length) return;
@@ -259,12 +260,15 @@ class Game {
         }
         //Battle.resolvePlayerAttack(this.player, this.enemies, this.questLog);
         AttackHandler.resolvePlayerAttack(this.player, this.enemies);
-
+        if(this.fightingBoss){
+            AttackHandler.resolvePlayerAttack(this.player, [this.bossfight]);
+        }
         for(const enemy of this.enemies){
             enemy.update(dt, this.player, this.map);
         }
 
         this.enemies = this.enemies.filter(e=>!e.dead);
+
 
         if(this.enemies.length === 0 && this.clearBuffer <= 0){
             let s = false
