@@ -14,29 +14,27 @@ export class Projectile{
         this.y += this.vy * dt;
     }
     collidesWith(player){
-        let p = player.body()
-        var distX = Math.abs(this.x - p.x-p.width/2);
-        var distY = Math.abs(this.y - p.y-p.height/2);
+        const p = player.body;
+        const distX = Math.abs(this.x - (p.x + p.w / 2));
+        const distY = Math.abs(this.y - (p.y + p.h / 2));
 
-        if(distX > (p.width / 2 + this.radius)) return false;
-        if(distY > (p.height / 2 + this.radius)) return false;
+        if(distX > (p.w / 2 + this.radius)) return false;
+        if(distY > (p.h / 2 + this.radius)) return false;
 
-        let hit = false; 
-        if (distX <= (p.width / 2)) {
-            hit = true;
-        } else if (distY <= (p.height / 2)) {
-            hit = true;
-        } else {
-            const dx = distX - p.width / 2;
-            const dy = distY - p.height / 2;
-            hit = (dx * dx + dy * dy <= (this.radius * this.radius));
+        if (distX <= (p.w / 2) || distY <= (p.h / 2)) {
+            return true;
         }
-        return hit;
+
+        const dx = distX - p.w / 2;
+        const dy = distY - p.h / 2;
+        return (dx * dx + dy * dy <= (this.radius * this.radius));
     }
     draw(ctx, camera){
         ctx.beginPath();
-        ctx.fillStyle = "rgba(255, 0, 0, 0.99)"
+        ctx.strokeStyle = "rgb(177, 19, 19)"; 
+        ctx.fillStyle = "rgba(246, 120, 120, 0.97)"
         ctx.arc(this.x-camera.x, this.y-camera.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
     }
 }
