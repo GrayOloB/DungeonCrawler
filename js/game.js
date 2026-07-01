@@ -258,7 +258,7 @@ class Game {
             return;
         }
         if(this.fightingBoss && this.bossfight){
-            this.bossfight.update(dt, this.player);
+            this.bossfight.update(dt, this.player, this.map);
             if(this.bossfight.hp<=0){
                 this.bossfight = null;
                 this.fightingBoss = false;
@@ -403,7 +403,7 @@ class Game {
             UI.drawScreen(ctx, "Game Over", "Press ENTER to try again", "#f08a8a");
         }
         if(this.state === STATE.WIN){
-            UI.drawScreen(ctx, "You Win!", "Every quest complete! Enter for title", "#9ad9b0");
+            UI.drawScreen(ctx, "You Win!", "You defeated the boss!", "#9ad9b0");
         }
     }
 }

@@ -52,8 +52,8 @@ export class Player {
 
         this.range = 40;
         this.attacking = false;
-        this.attackTimer = .25;
-        this.attackCooldown = .25;
+        this.attackTimer = .5;
+        this.attackCooldown = .5;
         this.attackAngle = 0;
         this.attackHasHit = false;
 
@@ -80,7 +80,7 @@ export class Player {
     }
 
     levelUp(){
-        Particles.burst(this.x,this.y,"#fff2a0", 100)
+        Particles.burst(this.x,this.y,"#ffe2a0", 10)
         this.level += 1;
         this.maxHp += CONFIG.HP_PER_LEVEL;
         this.attackDamage += CONFIG.DAMAGE_PER_LEVEL;
@@ -134,7 +134,7 @@ export class Player {
         }
         if((/*Input.wasPressed("Space") || */Input.mouseClicked) && !this.attacking){
             this.attacking = true;
-            this.attackTimer = this.attackCooldown;
+            this.attackTimer = .5;
             Input.mouseClicked = false;
             const screenX = Math.round(this.x - this.spriteOffsetX - camera.x);
             const screenY = Math.round(this.y - this.spriteOffsetY - camera.y);
@@ -195,7 +195,7 @@ export class Player {
 
     getSwordHitbox(){
         if (!this.attacking) return;
-        const tracking = 1 - (this.attackTimer / this.attackCooldown);
+        const tracking = 1 - (this.attackTimer / .3);
         const angle = -(60*Math.PI/180)/2 + (60*Math.PI/180)*tracking
         const cAngle = angle + this.attackAngle - Math.PI/2;
         const radius = this.range*1.6;
@@ -239,7 +239,7 @@ export class Player {
 
             const radius = this.range;
             ctx.translate(centerX, centerY);
-            const tracking = 1 - (this.attackTimer/this.attackCooldown);
+            const tracking = 1 - (this.attackTimer/.3);
             const angle = -(60*Math.PI/180)/2 + (60*Math.PI/180)*tracking
 
             const radians = this.attackAngle + angle;// + (Math.PI/2);
@@ -254,7 +254,7 @@ export class Player {
         //hitbox draw it outttttttt
         ctx.fillStyle = "rgba(255, 0, 0, 0.35)";
 
-        ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
+        //ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
 
         const hitbox = this.getSwordHitbox();
         if (hitbox) {

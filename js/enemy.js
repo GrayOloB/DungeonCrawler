@@ -30,12 +30,12 @@ const TYPES = {
     slime : {
         idleSheet: "slime_idle", hurtSheet : "slime_hurt", deathSheet : "slime_death",
         idleFrames : 8, hurtFrames : 2, deathFrames : 4,
-        hp : 10, speed:35, damage:3, sightRange:300, attackRange:30, xp:10,
+        hp : 10, speed:80, damage:3, sightRange:400, attackRange:30, xp:10,
     },
     bat : {
         idleSheet: "bat_idle", hurtSheet : "bat_hurt", deathSheet : "bat_death",
         idleFrames : 4, hurtFrames : 2, deathFrames : 5,
-        hp : 6, speed:60, damage:2, sightRange:160, attackRange:28, xp:7,
+        hp : 6, speed:100, damage:2, sightRange:400, attackRange:28, xp:7,
     },
 };
 
@@ -240,8 +240,8 @@ export class Enemy{
         }
 
         //hitbox
-        ctx.fillStyle = "rgba(252, 128, 128, 0.2)";
-        ctx.fillRect(this.x - camera.x,this.y - camera.y,this.width,this.height);
+        //ctx.fillStyle = "rgba(252, 128, 128, 0.2)";
+        //ctx.fillRect(this.x - camera.x,this.y - camera.y,this.width,this.height);
 
         this.anim.draw(ctx, sheet, row, sx, sy);
 
