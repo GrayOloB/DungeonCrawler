@@ -33,8 +33,8 @@ export class Player {
         const FRAME = CONFIG.PLAYER_FRAME_SIZE
         const SCALE = CONFIG.SCALE
         const bodyPx = 16 * SCALE
-        this.width = bodyPx//CONFIG.SCALED_TILE;
-        this.height = bodyPx//CONFIG.SCALED_TILE;
+        this.width = 36//CONFIG.SCALED_TILE;
+        this.height = 42//CONFIG.SCALED_TILE;
 
         const spriteSize = CONFIG.PLAYER_FRAME_SIZE * CONFIG.SCALE;
         this.spriteOffsetX = 16*SCALE
@@ -212,17 +212,18 @@ export class Player {
         };
     }
     draw(ctx, camera){
-
+        const hitboxXFix = 6
+        const hitboxYFix = 6
         
-        const screenX = Math.round(this.x - this.spriteOffsetX - camera.x);
-        const screenY = Math.round(this.y - this.spriteOffsetY - camera.y);
+        const screenX = Math.round(this.x - this.spriteOffsetX - camera.x-hitboxXFix);
+        const screenY = Math.round(this.y - this.spriteOffsetY - camera.y-hitboxYFix);
         const sheet = (this.moving ? "bunny_run" : "bunny_idle");
         const sheetSword = "sword"
 
         this.trail.forEach((t, i) => {
             //needs to pass camera position like above ^^^^^^^^  
-            const trailX = Math.round(t.x - this.spriteOffsetX - camera.x);
-            const trailY = Math.round(t.y - this.spriteOffsetY - camera.y);
+            const trailX = Math.round(t.x - this.spriteOffsetX - camera.x-hitboxXFix);
+            const trailY = Math.round(t.y - this.spriteOffsetY - camera.y-hitboxYFix);
             ctx.globalAlpha = ((i + 1) / this.trail.length) * 0.4;
             this.anim.draw(ctx, sheet, t.dir, trailX, trailY);
         });
@@ -251,6 +252,10 @@ export class Player {
 
         }
         //hitbox draw it outttttttt
+        ctx.fillStyle = "rgba(255, 0, 0, 0.35)";
+
+        ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
+
         const hitbox = this.getSwordHitbox();
         if (hitbox) {
             return;
