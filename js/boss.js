@@ -104,7 +104,7 @@ export class Boss{
                 this.cooldown = 2;
             }
             if(this.patternType === 4) {
-                this.bulletPattern(80, player, 10);
+                this.bulletPattern(80, player, 10, 150);
                 this.cooldown = 2.5;
             }
             if(this.patternType === 5) {
@@ -112,7 +112,7 @@ export class Boss{
                 this.cooldown = 1.75;
             }
             if(this.patternType === 6) {
-                this.bulletPattern(4, player, 3, 150);
+                this.bulletPattern(4, player, 3, 200);
                 this.cooldown = .25;
             }
             this.numAttacks++;
